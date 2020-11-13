@@ -1,0 +1,4 @@
+github.com/go-redis/redis v6.15.9+incompatible h1:K0pv1D7EQUjfyoMql+r/jZqCLizCGKFlFgcHWWmHQjg=
+github.com/go-redis/redis v6.15.9+incompatible/go.mod h1:NAIEuMOZ/fxfXJIrKDQDz8wamY7mA7PouImQ2Jvg6kA=
+github.com/rachihoaoi/vod_toolkit v0.0.0-20201112095853-8ce81ed45d7a h1:ce35DVL9yV6D+z0A6GbrvTs8JYAAnFsEd2+X+hFswbU=
+github.com/rachihoaoi/vod_toolkit v0.0.0-20201112095853-8ce81ed45d7a/go.mod h1:DYYEd2oU1WQ/C13555uUkM02D5JHtD6G1VdizoNLfcY=
