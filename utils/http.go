@@ -41,8 +41,11 @@ func DoHttpRequest(config *HttpRequestConfig) (b []byte, respHeader http.Header,
 			config.Url = Concatenate(arr)
 		}
 	}
-
-	fmt.Printf("\033[32m[%s]\033[0m \033[32m[%s]\033[0m %s \n payload: %v \n", "REQUEST_URL", config.Method, config.Url, body)
+	if body == nil {
+		fmt.Printf("\033[32m[%s]\033[0m \033[32m[%s]\033[0m %s\n", "REQUEST_URL", config.Method, config.Url)
+	} else {
+		fmt.Printf("\033[32m[%s]\033[0m \033[32m[%s]\033[0m %s\n\033[32m[PAYLOAD]\033[0m: %v \n", "REQUEST_URL", config.Method, config.Url, body)
+	}
 
 	if request, err = http.NewRequest(config.Method, config.Url, body); err != nil {
 		return

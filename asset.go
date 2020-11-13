@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/rachihoaoi/vod_toolkit/utils"
+	"github.com/rachihoaoi/vod-toolkit/utils"
 )
 
 type (
@@ -203,10 +203,10 @@ func (i *VideoInfo) SetAssetId(assetId string) {
 	i.assetId = assetId
 }
 
-func (i *VideoInfo) ConfirmUpload(assetId string, status string) (resp *UploadedResp, err error) {
+func (i *VideoInfo) ConfirmUpload(status string) (resp *UploadedResp, err error) {
 	resp = new(UploadedResp)
 	payload := &UploadedRequest{
-		AssetId: assetId,
+		AssetId: i.assetId,
 		Status:  status,
 	}
 	b, _, err := utils.DoHttpRequest(&utils.HttpRequestConfig{
@@ -340,7 +340,7 @@ func (i *VideoInfo) GetAssetAuthority() (resp *GetAssetAuthorityResponse, err er
 		ObjectKey:   i.target.Object,
 		UploadId:    i.uploadResult.UploadId,
 		PartNumber:  1,
-		// ContentMd5:  "MmIzMGQ3MjQzZDc2NzA3MjBmMzEzY2JlY2Y4NDRhZjA=",
+		ContentMd5:  "1B2M2Y8AsgTpgAmY7PhCfg==",
 	}
 	b, _, err := utils.DoHttpRequest(&utils.HttpRequestConfig{
 		Client:  i.Client.httpClient,
@@ -355,7 +355,7 @@ func (i *VideoInfo) GetAssetAuthority() (resp *GetAssetAuthorityResponse, err er
 	if err != nil {
 		return
 	}
-	fmt.Println(string(b))
+	// fmt.Println(string(b))
 	err = json.Unmarshal(b, &resp)
 	return
 }
