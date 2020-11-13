@@ -12,7 +12,7 @@ import (
 
 type (
 	VideoInfo struct {
-		client    *VodClient
+		Client    *vodClient
 		Title     string
 		Desc      string
 		Type      string

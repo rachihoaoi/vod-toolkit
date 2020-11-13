@@ -16,10 +16,10 @@ const (
 
 type (
 	GetAuthTokensPayload struct {
-		Auth Auth `json:"auth"`
+		Auth auth `json:"auth"`
 	}
 
-	Auth struct {
+	auth struct {
 		Identity *identity `json:"identity"`
 		Scope    *scope    `json:"scope,omitempty"`
 	}
@@ -60,14 +60,14 @@ type (
 	}
 
 	GetSecurityTokensRequest struct {
-		Auth Auth `json:"auth"`
+		Auth auth `json:"auth"`
 	}
 
 	GetSecurityTokensResp struct {
-		Credential *Credential `json:"credential"`
+		Credential *credential `json:"credential"`
 	}
 
-	Credential struct {
+	credential struct {
 		ExpiresAt     string `json:"expires_at"`
 		Access        string `json:"access"`
 		Secret        string `json:"secret"`
@@ -86,7 +86,7 @@ type (
 
 func BuildGetAuthTokensPayload(config *BuildConfig) *GetAuthTokensPayload {
 	return &GetAuthTokensPayload{
-		Auth: Auth{
+		Auth: auth{
 			Identity: &identity{
 				Methods: config.Method,
 				Password: &password{
@@ -107,7 +107,7 @@ func BuildGetAuthTokensPayload(config *BuildConfig) *GetAuthTokensPayload {
 	}
 }
 
-func (c *VodClient) GetAuthToken() (err error) {
+func (c *vodClient) GetAuthToken() (err error) {
 	redisClient := GetRedisClient()
 	requestBody := BuildGetAuthTokensPayload(&BuildConfig{
 		Method:       []string{"password"},
@@ -141,9 +141,9 @@ func (c *VodClient) GetAuthToken() (err error) {
 	return errors.New("empty Token")
 }
 
-func (c *VodClient) GetSecurityTokens() (resp *GetSecurityTokensResp, err error) {
+func (c *vodClient) GetSecurityTokens() (resp *GetSecurityTokensResp, err error) {
 	payload := &GetSecurityTokensRequest{
-		Auth: Auth{
+		Auth: auth{
 			Identity: &identity{
 				Methods: []string{"token"},
 			},
@@ -167,7 +167,7 @@ func (c *VodClient) GetSecurityTokens() (resp *GetSecurityTokensResp, err error)
 	return
 }
 
-func (c *VodClient) GetJSClientConfig() (resp *JSClientConfig, err error) {
+func (c *vodClient) GetJSClientConfig() (resp *JSClientConfig, err error) {
 	var st = new(GetSecurityTokensResp)
 	if st, err = c.GetSecurityTokens(); err != nil {
 		return resp, err
