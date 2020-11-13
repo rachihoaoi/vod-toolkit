@@ -182,11 +182,11 @@ func (i *VideoInfo) CreateAsset() (resp *CreateAssetResponse, err error) {
 		request.CategoryId = VOD_CATAGORY_OTHERS
 	}
 	b, _, err := utils.DoHttpRequest(&utils.HttpRequestConfig{
-		Client: i.client.httpClient,
-		Url:    fmt.Sprintf(CREATE_ASSET_URL, i.client.config.vod.projectId),
+		Client: i.Client.httpClient,
+		Url:    fmt.Sprintf(CREATE_ASSET_URL, i.Client.config.vod.projectId),
 		Method: http.MethodPost,
 		Header: map[string]string{
-			HUAWEI_AUTH_TOKEN_NAME: i.client.config.auth.token,
+			HUAWEI_AUTH_TOKEN_NAME: i.Client.config.auth.token,
 			"Content-Type":         "application/json;charset=UTF-8",
 		},
 		Payload: request,
@@ -210,11 +210,11 @@ func (i *VideoInfo) ConfirmUpload(assetId string, status string) (resp *Uploaded
 		Status:  status,
 	}
 	b, _, err := utils.DoHttpRequest(&utils.HttpRequestConfig{
-		Client: i.client.httpClient,
-		Url:    fmt.Sprintf(ASSET_UPLOAD_CHECK_URL, i.client.config.vod.projectId),
+		Client: i.Client.httpClient,
+		Url:    fmt.Sprintf(ASSET_UPLOAD_CHECK_URL, i.Client.config.vod.projectId),
 		Method: http.MethodPost,
 		Header: map[string]string{
-			HUAWEI_AUTH_TOKEN_NAME: i.client.config.auth.token,
+			HUAWEI_AUTH_TOKEN_NAME: i.Client.config.auth.token,
 		},
 		Payload: payload,
 		TagName: TAG_JSON,
@@ -239,11 +239,11 @@ func (i *VideoInfo) Publish() (resp PublishResp, err error) {
 		AssetId: []string{i.assetId},
 	}
 	b, _, err := utils.DoHttpRequest(&utils.HttpRequestConfig{
-		Client: i.client.httpClient,
-		Url:    fmt.Sprintf(PUBLISH_VIDEO_URL, i.client.config.vod.projectId),
+		Client: i.Client.httpClient,
+		Url:    fmt.Sprintf(PUBLISH_VIDEO_URL, i.Client.config.vod.projectId),
 		Method: http.MethodPost,
 		Header: map[string]string{
-			HUAWEI_AUTH_TOKEN_NAME: i.client.config.auth.token,
+			HUAWEI_AUTH_TOKEN_NAME: i.Client.config.auth.token,
 		},
 		Payload: payload,
 		TagName: TAG_JSON,
@@ -267,11 +267,11 @@ func (i *VideoInfo) GetAssetDetail() (resp *GetAssetDetailResponse, err error) {
 		Categories: "base_info",
 	}
 	b, _, err := utils.DoHttpRequest(&utils.HttpRequestConfig{
-		Client: i.client.httpClient,
-		Url:    fmt.Sprintf(GET_ASSET_DETAIL_URL, i.client.config.vod.projectId),
+		Client: i.Client.httpClient,
+		Url:    fmt.Sprintf(GET_ASSET_DETAIL_URL, i.Client.config.vod.projectId),
 		Method: http.MethodGet,
 		Header: map[string]string{
-			HUAWEI_AUTH_TOKEN_NAME: i.client.config.auth.token,
+			HUAWEI_AUTH_TOKEN_NAME: i.Client.config.auth.token,
 		},
 		Payload: payload,
 		TagName: TAG_JSON,
@@ -294,11 +294,11 @@ func (i *VideoInfo) InitAssetAuthority(bucket, objectKey string) (resp *InitAsse
 		ObjectKey:   i.target.Object,
 	}
 	b, _, err := utils.DoHttpRequest(&utils.HttpRequestConfig{
-		Client: i.client.httpClient,
-		Url:    fmt.Sprintf(GET_ASSET_AUTH_URL, i.client.config.vod.projectId),
+		Client: i.Client.httpClient,
+		Url:    fmt.Sprintf(GET_ASSET_AUTH_URL, i.Client.config.vod.projectId),
 		Method: http.MethodGet,
 		Header: map[string]string{
-			HUAWEI_AUTH_TOKEN_NAME: i.client.config.auth.token,
+			HUAWEI_AUTH_TOKEN_NAME: i.Client.config.auth.token,
 		},
 		Payload: queryPayload,
 		TagName: TAG_JSON,
@@ -314,7 +314,7 @@ func (i *VideoInfo) InitAssetAuthority(bucket, objectKey string) (resp *InitAsse
 
 func (i *VideoInfo) InitUploadJob() (resp *InitiateMultipartUploadResult, err error) {
 	b, _, err := utils.DoHttpRequest(&utils.HttpRequestConfig{
-		Client: i.client.httpClient,
+		Client: i.Client.httpClient,
 		Url:    i.authorizedUrl,
 		Method: http.MethodPost,
 		Header: map[string]string{
@@ -343,12 +343,12 @@ func (i *VideoInfo) GetAssetAuthority() (resp *GetAssetAuthorityResponse, err er
 		// ContentMd5:  "MmIzMGQ3MjQzZDc2NzA3MjBmMzEzY2JlY2Y4NDRhZjA=",
 	}
 	b, _, err := utils.DoHttpRequest(&utils.HttpRequestConfig{
-		Client:  i.client.httpClient,
-		Url:     fmt.Sprintf(GET_ASSET_AUTH_URL, i.client.config.vod.projectId),
+		Client:  i.Client.httpClient,
+		Url:     fmt.Sprintf(GET_ASSET_AUTH_URL, i.Client.config.vod.projectId),
 		Method:  http.MethodGet,
 		TagName: TAG_JSON,
 		Header: map[string]string{
-			HUAWEI_AUTH_TOKEN_NAME: i.client.config.auth.token,
+			HUAWEI_AUTH_TOKEN_NAME: i.Client.config.auth.token,
 		},
 		Payload: payload,
 	})
