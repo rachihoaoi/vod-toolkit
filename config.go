@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	locker sync.Locker
+	locker = new(sync.Mutex)
 	cfg    *config
 )
 

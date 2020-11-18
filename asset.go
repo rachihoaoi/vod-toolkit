@@ -340,7 +340,7 @@ func (i *VideoInfo) GetAssetAuthority() (resp *GetAssetAuthorityResponse, err er
 		ObjectKey:   i.target.Object,
 		UploadId:    i.uploadResult.UploadId,
 		PartNumber:  1,
-		ContentMd5:  "1B2M2Y8AsgTpgAmY7PhCfg==",
+		ContentMd5:  "",
 	}
 	b, _, err := utils.DoHttpRequest(&utils.HttpRequestConfig{
 		Client:  i.Client.httpClient,
