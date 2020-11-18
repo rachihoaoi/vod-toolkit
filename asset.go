@@ -25,6 +25,11 @@ type (
 		uploadResult  InitiateMultipartUploadResult
 	}
 
+	ErrorInfo struct {
+		ErrorCode string `json:"error_code" desc:"错误码"`
+		ErrorMsg  string `json:"error_msg" desc:"错误描述"`
+	}
+
 	CreateAssetRequest struct {
 		Title       string `json:"title"`
 		Description string `json:"description"`
@@ -36,6 +41,7 @@ type (
 	}
 
 	CreateAssetResponse struct {
+		*ErrorInfo
 		AssetId            string   `json:"asset_id"`
 		VideoUploadUrl     string   `json:"video_upload_url"`
 		CoverUploadUrl     string   `json:"cover_upload_url"`
@@ -49,18 +55,13 @@ type (
 		Object   string `json:"object"`
 	}
 
-	ErrorInfo struct {
-		ErrorCode string `json:"error_code" desc:"错误码"`
-		ErrorMsg  string `json:"error_msg" desc:"错误描述"`
-	}
-
 	UploadedRequest struct {
 		AssetId string `json:"asset_id"`
 		Status  string `json:"status"`
 	}
 
 	UploadedResp struct {
-		ErrorInfo
+		*ErrorInfo
 		AssetId string `json:"asset_id"`
 	}
 
@@ -69,6 +70,7 @@ type (
 	}
 
 	PublishResp struct {
+		*ErrorInfo
 		AssetInfoArray []AssetInfo `json:"asset_info_array"`
 	}
 
@@ -121,6 +123,7 @@ type (
 	}
 
 	GetAssetDetailResponse struct {
+		*ErrorInfo
 		AssetId  string    `json:"asset_id"`
 		BaseInfo *BaseInfo `json:"base_info"`
 		// TranscodeInfo *TranscodeInfo `json:"transcode_info"`
@@ -136,6 +139,7 @@ type (
 	}
 
 	InitAssetAuthorityResponse struct {
+		*ErrorInfo
 		SignStr string `json:"sign_str"`
 	}
 
@@ -150,6 +154,7 @@ type (
 	}
 
 	GetAssetAuthorityResponse struct {
+		*ErrorInfo
 		SignStr string `json:"sign_str"`
 	}
 
@@ -162,6 +167,10 @@ type (
 		Description string   `xml:",innerxml"`
 	}
 )
+
+func (ei *ErrorInfo) Error() string {
+	return fmt.Sprintf("[%s]: %s", ei.ErrorCode, ei.ErrorMsg)
+}
 
 var Catagory = map[string]int64{
 	"test": VOD_CATAGORY_TEST,
@@ -196,6 +205,9 @@ func (i *VideoInfo) CreateAsset() (resp *CreateAssetResponse, err error) {
 	}
 	err = json.Unmarshal(b, resp)
 	i.target = resp.Target
+	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
+		return resp, resp.ErrorInfo
+	}
 	return
 }
 
@@ -225,8 +237,8 @@ func (i *VideoInfo) ConfirmUpload(status string) (resp *UploadedResp, err error)
 	if err = json.Unmarshal(b, &resp); err != nil {
 		return
 	}
-	if resp.ErrorCode != "" {
-		return nil, errors.New(resp.ErrorCode + ":" + resp.ErrorMsg)
+	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
+		return resp, resp.ErrorInfo
 	}
 	return resp, nil
 }
@@ -253,6 +265,9 @@ func (i *VideoInfo) Publish() (resp PublishResp, err error) {
 	}
 	if err = json.Unmarshal(b, &resp); err != nil {
 		return
+	}
+	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
+		return resp, resp.ErrorInfo
 	}
 	return
 }
@@ -282,6 +297,9 @@ func (i *VideoInfo) GetAssetDetail() (resp *GetAssetDetailResponse, err error) {
 	if err = json.Unmarshal(b, &resp); err != nil {
 		return
 	}
+	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
+		return resp, resp.ErrorInfo
+	}
 	return
 }
 
@@ -308,6 +326,9 @@ func (i *VideoInfo) InitAssetAuthority(bucket, objectKey string) (resp *InitAsse
 	}
 	if err = json.Unmarshal(b, &resp); err == nil {
 		i.authorizedUrl = resp.SignStr
+	}
+	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
+		return resp, resp.ErrorInfo
 	}
 	return
 }
@@ -355,7 +376,9 @@ func (i *VideoInfo) GetAssetAuthority() (resp *GetAssetAuthorityResponse, err er
 	if err != nil {
 		return
 	}
-	// fmt.Println(string(b))
 	err = json.Unmarshal(b, &resp)
+	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
+		return resp, resp.ErrorInfo
+	}
 	return
 }

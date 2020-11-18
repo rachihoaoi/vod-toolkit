@@ -107,8 +107,9 @@ func BuildGetAuthTokensPayload(config *BuildConfig) *GetAuthTokensPayload {
 	}
 }
 
-func (c *vodClient) GetAuthToken() (err error) {
+func (c *vodClient) RefreshToken() error {
 	redisClient := GetRedisClient()
+	key := fmt.Sprintf("%s_%s_%s", c.config.vod.projectName, c.config.vod.domain, c.config.auth.userName)
 	requestBody := BuildGetAuthTokensPayload(&BuildConfig{
 		Method:       []string{"password"},
 		UserName:     c.config.auth.userName,
@@ -116,13 +117,6 @@ func (c *vodClient) GetAuthToken() (err error) {
 		DomainName:   c.config.vod.domain,
 		ProjectName:  c.config.vod.projectName,
 	})
-
-	key := fmt.Sprintf("%s_%s_%s", c.config.vod.projectName, c.config.vod.domain, c.config.auth.userName)
-	if token, err := redisClient.Get(key).Result(); err == nil && token != "" {
-		fmt.Println("[Get Token From Redis]: " + token)
-		c.config.auth.token = token
-		return nil
-	}
 	_, header, err := utils.DoHttpRequest(&utils.HttpRequestConfig{
 		Client:  c.httpClient,
 		Url:     AUTH_TOKEN_URL,
@@ -136,9 +130,21 @@ func (c *vodClient) GetAuthToken() (err error) {
 	c.config.auth.token = header.Get(HUAWEI_TOKEN_NAME)
 	if c.config.auth.token != "" {
 		redisClient.Set(key, c.config.auth.token, TOKEN_EXPIRE_TIME)
-		return
+		return nil
 	}
 	return errors.New("empty Token")
+}
+
+func (c *vodClient) GetAuthToken() (err error) {
+	redisClient := GetRedisClient()
+
+	key := fmt.Sprintf("%s_%s_%s", c.config.vod.projectName, c.config.vod.domain, c.config.auth.userName)
+	if token, err := redisClient.Get(key).Result(); err == nil && token != "" {
+		fmt.Println("[Get Token From Redis]: " + token)
+		c.config.auth.token = token
+		return nil
+	}
+	return c.RefreshToken()
 }
 
 func (c *vodClient) GetSecurityTokens() (resp *GetSecurityTokensResp, err error) {
