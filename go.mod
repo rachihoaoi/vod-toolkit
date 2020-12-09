@@ -4,5 +4,7 @@ go 1.14
 
 require (
 	github.com/go-redis/redis v6.15.9+incompatible
-	github.com/rachihoaoi/vod_toolkit v0.0.0-20201112095853-8ce81ed45d7a
+	github.com/onsi/ginkgo v1.14.2 // indirect
+	github.com/onsi/gomega v1.10.3 // indirect
+	github.com/satori/go.uuid v1.2.0
 )

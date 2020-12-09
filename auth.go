@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rachihoaoi/vod_toolkit/utils"
+	"github.com/rachihoaoi/vod-toolkit/utils"
 )
 
 const (

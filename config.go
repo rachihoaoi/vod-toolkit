@@ -30,10 +30,17 @@ type redisSettings struct {
 	redisPassword string
 }
 
+type referSettings struct {
+	algorithm  referEncodingAlgorithm
+	originUrl  string
+	privateKey string
+}
+
 type config struct {
 	auth  authSettings
 	vod   vodSettings
 	redis redisSettings
+	refer referSettings
 }
 
 func GetConfig() *config {
@@ -63,10 +70,12 @@ func InitConfig() {
 			redisAddr:     os.Getenv("REDIS_ADDR"),
 			redisPassword: os.Getenv("REDIS_PWD"),
 		}
+		_refer := referSettings{}
 		cfg = &config{
 			auth:  _authSettings,
 			vod:   _vodSettings,
 			redis: _redisSettings,
+			refer: _refer,
 		}
 	}
 }
