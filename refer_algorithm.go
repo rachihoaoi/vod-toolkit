@@ -38,11 +38,20 @@ type (
 		referUrl   string
 	}
 	algorithmC struct {
+		timeHex    string
+		fileName   string
+		privateKey string
+		referUrl   string
 	}
 	algorithmD struct {
+		path       string
+		timeStamp  string
+		privateKey string
 	}
 )
 
+// ------------------------------algorithmA------------------------------
+// https://support.huaweicloud.com/usermanual-vod/vod010014.html#section4
 func (a *algorithmA) setOriginalUrl(u string) {
 	a.referUrl = u
 }
@@ -57,6 +66,8 @@ func (a *algorithmA) GetAuthorizedUrl() string {
 	return a.referUrl + "?" + fmt.Sprintf(template, a.timestamp, a.rand, a.uid, authKey)
 }
 
+// ------------------------------algorithmB------------------------------
+// https://support.huaweicloud.com/usermanual-vod/vod010014.html#section5
 func (b *algorithmB) setOriginalUrl(u string) {
 	b.referUrl = u
 }
@@ -65,11 +76,38 @@ func (b *algorithmB) GetAuthorizedUrl() string {
 	// md5sum = md5({private_key}{date_yyyyMMddHHmm}/asset/{asset_id}/{file_name})
 	// url_template = https://{cdn_domain}/{date_YYYYmmddHHMM}/{md5sum}/asset/{asset_id}/{file_name}
 	assetPart := strings.Split(b.referUrl, "/")
-	cdnName, assetName, fileName := assetPart[2], assetPart[4], assetPart[5]
+	cdnName, assetName, fileName := assetPart[2], assetPart[4], strings.Join(assetPart[5:], "/")
 	b.fileName = fileName
 	rawStr := fmt.Sprintf("%s%s/asset/%s/%s", b.privateKey, b.date, assetName, b.fileName)
 	md5Sum := fmt.Sprintf("%s", md5.Sum([]byte(rawStr)))
-	return fmt.Sprintf("https://%s/%s/%s/asset/%s/%s", cdnName, b.date, md5Sum, assetName, b.fileName)
+	return fmt.Sprintf("https://%s/%s/%x/asset/%s/%s", cdnName, b.date, md5Sum, assetName, b.fileName)
+}
+
+// ------------------------------algorithmC------------------------------
+// https://support.huaweicloud.com/usermanual-vod/vod010014.html#section6
+func (c *algorithmC) setOriginalUrl(u string) {
+	c.referUrl = u
+}
+
+func (c *algorithmC) GetAuthorizedUrl() string {
+	// md5sum = md5({private_key}{date_yyyyMMddHHmm}/asset/{asset_id}/{file_name})
+	// url_template = https://{cdn_domain}/{md5hash}/{time_hex}/asset/{asset_id}/{file_name}
+	assetPart := strings.Split(c.referUrl, "/")
+	cdnName, assetName, fileName := assetPart[2], assetPart[4], strings.Join(assetPart[5:], "/")
+	c.fileName = fileName
+	rawStr := fmt.Sprintf("%s/asset/%s/%s%s", c.privateKey, assetName, c.fileName, c.timeHex)
+	md5Sum := fmt.Sprintf("%s", md5.Sum([]byte(rawStr)))
+	return fmt.Sprintf("https://%s/%x/%s/asset/%s/%s", cdnName, md5Sum, c.timeHex, assetName, c.fileName)
+}
+
+// ------------------------------algorithmD------------------------------
+// https://support.huaweicloud.com/usermanual-vod/vod010014.html#section7
+func (d *algorithmD) setOriginalUrl(u string) {
+
+}
+
+func (d *algorithmD) GetAuthorizedUrl() string {
+	return ""
 }
 
 func (c *vodClient) GetAuthorizedUrl() string {
@@ -102,9 +140,9 @@ func generateAlgorithm(algorithmType AlgorithmType, privateKey string) referEnco
 	case Algorithm.AlgorithmB:
 		return newAlgorithmB(privateKey)
 	case Algorithm.AlgorithmC:
-		return newAlgorithmA(privateKey)
+		return newAlgorithmC(privateKey)
 	case Algorithm.AlgorithmD:
-		return newAlgorithmA(privateKey)
+		return newAlgorithmD(privateKey)
 	default:
 		return newAlgorithmA(privateKey)
 	}
@@ -122,6 +160,21 @@ func newAlgorithmA(privateKey string) *algorithmA {
 func newAlgorithmB(privateKey string) *algorithmB {
 	return &algorithmB{
 		date:       time.Now().Format("200601021504"),
+		privateKey: privateKey,
+	}
+}
+
+func newAlgorithmC(privateKey string) *algorithmC {
+	return &algorithmC{
+		timeHex:    fmt.Sprintf("%X", time.Now().Unix()),
+		privateKey: privateKey,
+	}
+}
+
+func newAlgorithmD(privateKey string) *algorithmD {
+	return &algorithmD{
+		path:       "",
+		timeStamp:  "",
 		privateKey: privateKey,
 	}
 }
