@@ -123,7 +123,7 @@ type (
 	}
 
 	GetAssetDetailResponse struct {
-		*ErrorInfo
+		ErrorInfo
 		AssetId  string    `json:"asset_id"`
 		BaseInfo *BaseInfo `json:"base_info"`
 		// TranscodeInfo *TranscodeInfo `json:"transcode_info"`
@@ -139,7 +139,7 @@ type (
 	}
 
 	InitAssetAuthorityResponse struct {
-		*ErrorInfo
+		ErrorInfo
 		SignStr string `json:"sign_str"`
 	}
 
@@ -154,7 +154,7 @@ type (
 	}
 
 	GetAssetAuthorityResponse struct {
-		*ErrorInfo
+		ErrorInfo
 		SignStr string `json:"sign_str"`
 	}
 
@@ -168,8 +168,8 @@ type (
 	}
 )
 
-func (ei ErrorInfo) Error() string {
-	return fmt.Sprintf("[%s]: %s", ei.ErrorCode, ei.ErrorMsg)
+func buildError(ei ErrorInfo) error {
+	return fmt.Errorf("[%s]: %s", ei.ErrorCode, ei.ErrorMsg)
 }
 
 var Catagory = map[string]int64{
@@ -206,7 +206,7 @@ func (i *VideoInfo) CreateAsset() (resp *CreateAssetResponse, err error) {
 	err = json.Unmarshal(b, resp)
 	i.target = resp.Target
 	if resp.ErrorCode != "" {
-		return resp, resp.ErrorInfo
+		return resp, buildError(resp.ErrorInfo)
 	}
 	return
 }
@@ -238,7 +238,7 @@ func (i *VideoInfo) ConfirmUpload(status string) (resp *UploadedResp, err error)
 		return
 	}
 	if resp.ErrorCode != "" {
-		return resp, resp.ErrorInfo
+		return resp, buildError(resp.ErrorInfo)
 	}
 	return resp, nil
 }
@@ -267,7 +267,7 @@ func (i *VideoInfo) Publish() (resp PublishResp, err error) {
 		return
 	}
 	if resp.ErrorCode != "" {
-		return resp, resp.ErrorInfo
+		return resp, buildError(resp.ErrorInfo)
 	}
 	return
 }
@@ -297,8 +297,8 @@ func (i *VideoInfo) GetAssetDetail() (resp *GetAssetDetailResponse, err error) {
 	if err = json.Unmarshal(b, &resp); err != nil {
 		return
 	}
-	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
-		return resp, resp.ErrorInfo
+	if resp.ErrorCode != "" {
+		return resp, buildError(resp.ErrorInfo)
 	}
 	return
 }
@@ -327,8 +327,8 @@ func (i *VideoInfo) InitAssetAuthority(bucket, objectKey string) (resp *InitAsse
 	if err = json.Unmarshal(b, &resp); err == nil {
 		i.authorizedUrl = resp.SignStr
 	}
-	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
-		return resp, resp.ErrorInfo
+	if resp.ErrorCode != "" {
+		return resp, buildError(resp.ErrorInfo)
 	}
 	return
 }
@@ -377,8 +377,8 @@ func (i *VideoInfo) GetAssetAuthority() (resp *GetAssetAuthorityResponse, err er
 		return
 	}
 	err = json.Unmarshal(b, &resp)
-	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
-		return resp, resp.ErrorInfo
+	if resp.ErrorCode != "" {
+		return resp, buildError(resp.ErrorInfo)
 	}
 	return
 }
