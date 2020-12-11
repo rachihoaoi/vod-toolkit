@@ -41,7 +41,7 @@ type (
 	}
 
 	CreateAssetResponse struct {
-		*ErrorInfo
+		ErrorInfo
 		AssetId            string   `json:"asset_id"`
 		VideoUploadUrl     string   `json:"video_upload_url"`
 		CoverUploadUrl     string   `json:"cover_upload_url"`
@@ -61,7 +61,7 @@ type (
 	}
 
 	UploadedResp struct {
-		*ErrorInfo
+		ErrorInfo
 		AssetId string `json:"asset_id"`
 	}
 
@@ -70,7 +70,7 @@ type (
 	}
 
 	PublishResp struct {
-		*ErrorInfo
+		ErrorInfo
 		AssetInfoArray []AssetInfo `json:"asset_info_array"`
 	}
 
@@ -168,7 +168,7 @@ type (
 	}
 )
 
-func (ei *ErrorInfo) Error() string {
+func (ei ErrorInfo) Error() string {
 	return fmt.Sprintf("[%s]: %s", ei.ErrorCode, ei.ErrorMsg)
 }
 
@@ -205,7 +205,7 @@ func (i *VideoInfo) CreateAsset() (resp *CreateAssetResponse, err error) {
 	}
 	err = json.Unmarshal(b, resp)
 	i.target = resp.Target
-	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
+	if resp.ErrorCode != "" {
 		return resp, resp.ErrorInfo
 	}
 	return
@@ -237,7 +237,7 @@ func (i *VideoInfo) ConfirmUpload(status string) (resp *UploadedResp, err error)
 	if err = json.Unmarshal(b, &resp); err != nil {
 		return
 	}
-	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
+	if resp.ErrorCode != "" {
 		return resp, resp.ErrorInfo
 	}
 	return resp, nil
@@ -266,7 +266,7 @@ func (i *VideoInfo) Publish() (resp PublishResp, err error) {
 	if err = json.Unmarshal(b, &resp); err != nil {
 		return
 	}
-	if resp.ErrorInfo != nil && resp.ErrorCode != "" {
+	if resp.ErrorCode != "" {
 		return resp, resp.ErrorInfo
 	}
 	return

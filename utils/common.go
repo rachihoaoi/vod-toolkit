@@ -1,9 +1,12 @@
 package utils
 
 import (
+	"fmt"
+	"math/rand"
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func ConvertStructToMap(s interface{}, tagName string, allString bool) (result map[string]interface{}) {
@@ -56,4 +59,11 @@ func Concatenate(str []string) string {
 		res.WriteString(str[i])
 	}
 	return res.String()
+}
+
+func GetRandByteString(length int) string {
+	token := make([]byte, length)
+	rand.Seed(time.Now().UnixNano())
+	rand.Read(token)
+	return fmt.Sprintf("%x", token)
 }

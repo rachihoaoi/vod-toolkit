@@ -7,6 +7,8 @@ import (
 	"time"
 
 	uuid "github.com/satori/go.uuid"
+
+	"github.com/rachihoaoi/vod-toolkit/utils"
 )
 
 type AlgorithmType string
@@ -15,8 +17,8 @@ var Algorithm = struct {
 	AlgorithmA AlgorithmType
 	AlgorithmB AlgorithmType
 	AlgorithmC AlgorithmType
-	AlgorithmD AlgorithmType
-}{AlgorithmA: "Algorithm_A", AlgorithmB: "Algorithm_B", AlgorithmC: "Algorithm_C", AlgorithmD: "Algorithm_D"}
+	// AlgorithmD AlgorithmType
+}{AlgorithmA: "Algorithm_A", AlgorithmB: "Algorithm_B", AlgorithmC: "Algorithm_C"}
 
 type referEncodingAlgorithm interface {
 	setOriginalUrl(u string)
@@ -47,6 +49,8 @@ type (
 		path       string
 		timeStamp  string
 		privateKey string
+		referUrl   string
+		IV         string
 	}
 )
 
@@ -103,11 +107,16 @@ func (c *algorithmC) GetAuthorizedUrl() string {
 // ------------------------------algorithmD------------------------------
 // https://support.huaweicloud.com/usermanual-vod/vod010014.html#section7
 func (d *algorithmD) setOriginalUrl(u string) {
-
+	d.referUrl = u
+	assetPart := strings.Split(d.referUrl, "/")
+	if len(assetPart) < 5 {
+		return
+	}
+	d.path = "/" + strings.Join(assetPart[3:len(assetPart)-1], "/") + "/"
 }
 
 func (d *algorithmD) GetAuthorizedUrl() string {
-	return ""
+	panic("unImplement")
 }
 
 func (c *vodClient) GetAuthorizedUrl() string {
@@ -141,8 +150,8 @@ func generateAlgorithm(algorithmType AlgorithmType, privateKey string) referEnco
 		return newAlgorithmB(privateKey)
 	case Algorithm.AlgorithmC:
 		return newAlgorithmC(privateKey)
-	case Algorithm.AlgorithmD:
-		return newAlgorithmD(privateKey)
+	// case Algorithm.AlgorithmD:
+	// 	return newAlgorithmD(privateKey)
 	default:
 		return newAlgorithmA(privateKey)
 	}
@@ -173,8 +182,8 @@ func newAlgorithmC(privateKey string) *algorithmC {
 
 func newAlgorithmD(privateKey string) *algorithmD {
 	return &algorithmD{
-		path:       "",
-		timeStamp:  "",
+		timeStamp:  time.Now().Format("200601021504"),
 		privateKey: privateKey,
+		IV:         utils.GetRandByteString(16),
 	}
 }
